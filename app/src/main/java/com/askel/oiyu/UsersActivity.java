@@ -1,5 +1,8 @@
 package com.askel.oiyu;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +18,9 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UsersActivity extends AppCompatActivity {
     private RecyclerView mUsersList;
@@ -68,6 +74,18 @@ public class UsersActivity extends AppCompatActivity {
                 // Bind the Chat object to the ChatHolder
                 holder.setName(model.getName());
                 holder.setStatus(model.getStatus());
+                holder.setImage(model.getImage(),getApplicationContext());
+
+                final String user_id=getRef(position).getKey();
+
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent profileIntent=new Intent(UsersActivity.this, ProfileActivity.class);
+                        profileIntent.putExtra("user_id",user_id);
+                        startActivity(profileIntent);
+                    }
+                });
                 // ...
             }
 
@@ -94,6 +112,10 @@ public class UsersActivity extends AppCompatActivity {
         public void setStatus(String status){
             TextView userStatusView=(TextView) mView.findViewById(R.id.user_single_status);
             userStatusView.setText(status);
+        }
+        public void setImage(String image, Context ctx){
+            CircleImageView userImage=(CircleImageView) mView.findViewById(R.id.user_single_image);
+            Picasso.with(ctx).load(image).placeholder(R.drawable.default_avatar).into(userImage);
         }
     }
 }
