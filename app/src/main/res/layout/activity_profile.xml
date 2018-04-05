@@ -7,6 +7,15 @@
     android:background="#1e1b1b"
     tools:context=".ProfileActivity">
 
+    <Button
+        android:id="@+id/profile_send_requestbtn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="83dp"
+        android:text="Send Friend Request" />
+
     <TextView
         android:id="@+id/profile_display_name"
         android:layout_width="wrap_content"
@@ -21,7 +30,7 @@
 
     <ImageView
         android:id="@+id/profile_image"
-        android:layout_width="match_parent"
+        android:layout_width="400dp"
         android:layout_height="197dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
@@ -43,16 +52,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="127dp"
+        android:layout_marginBottom="142dp"
         android:text="Total Friends"
         android:textColor="#FFFFFF" />
 
     <Button
-        android:id="@+id/profile_send_requestbtn"
+        android:id="@+id/profile_decline_request"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="46dp"
-        android:text="Send Friend Request" />
+        android:layout_marginBottom="28dp"
+        android:text="Decline Friend Request" />
 </RelativeLayout>
