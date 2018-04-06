@@ -77,7 +77,37 @@ public class ProfileActivity extends AppCompatActivity {
                 mProfileStatus.setText(status);
 
                 Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mProfileImage);
-                mProgressBar.dismiss();
+
+                //------------------Friends List/Request Feature-------------------------------//
+
+                mFriendReqDatabase.child(mCurrent_user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.hasChild(user_id)){
+                            String req_type=dataSnapshot.child(user_id).child("request_type").getValue().toString();
+                            if (req_type.equals("recieved")){
+
+                                mCurrent_state="req_recieved";
+                                mProfileSendRequestBtn.setText("Accept Friend Request");
+
+                            }else if(req_type.equals("sent")){
+                                mCurrent_state="req_sent";
+                                mProfileSendRequestBtn.setText("Cancel Friend Request");
+
+                            }
+
+                        }
+
+                        mProgressBar.dismiss();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
             }
 
             @Override
@@ -89,6 +119,10 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                mProfileSendRequestBtn.setEnabled(false);
+
+
+                //Not friends-request
                  if (mCurrent_state.equals("not_friends")){
 
                      mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id)
@@ -101,12 +135,35 @@ public class ProfileActivity extends AppCompatActivity {
                                          .setValue("recieved").addOnSuccessListener(new OnSuccessListener<Void>() {
                                      @Override
                                      public void onSuccess(Void aVoid) {
-                                         Toast.makeText(ProfileActivity.this, "Request Sent Successfully", Toast.LENGTH_SHORT).show();
+
+                                         mProfileSendRequestBtn.setEnabled(true);
+                                         mCurrent_state="req_sent";
+                                         mProfileSendRequestBtn.setText("Cancel Friend Request");
+                                        // Toast.makeText(ProfileActivity.this, "Request Sent Successfully", Toast.LENGTH_SHORT).show();
                                      }
                                  });
                              }else{
                                  Toast.makeText(ProfileActivity.this, "Failed Sending Request", Toast.LENGTH_SHORT).show();
                              }
+                         }
+                     });
+
+                 }
+                 //Cancel Request State
+                 if (mCurrent_state.equals("req_sent")){
+                     mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                         @Override
+                         public void onSuccess(Void aVoid) {
+                             mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                 @Override
+                                 public void onSuccess(Void aVoid) {
+
+                                     mProfileSendRequestBtn.setEnabled(true);
+                                     mCurrent_state="not_friends";
+                                     mProfileSendRequestBtn.setText("Send Friend Request");
+
+                                 }
+                             });
                          }
                      });
 
