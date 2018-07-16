@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context=".WelcomeActivity"
+android:background="@color/colorPrimary">
+
+<TextView
+    android:id="@+id/welcome_title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentTop="true"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="169dp"
+    android:text="  OiYU "
+    android:textColor="@color/common_google_signin_btn_text_dark_default"
+    android:textSize="40sp"
+    tools:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+<TextView
+    android:id="@+id/welcome_version"
+    android:layout_width="91dp"
+    android:layout_height="wrap_content"
+    android:layout_alignEnd="@+id/welcome_title"
+    android:layout_alignRight="@+id/welcome_title"
+    android:layout_below="@+id/welcome_title"
+    android:text="Version 1.0" />
+</RelativeLayout>

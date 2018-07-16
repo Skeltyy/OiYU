@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".OiYU">
-        <activity android:name=".MainActivity">
+        <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,6 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".StartActivity" />
+        <activity android:name=".MainActivity"
+            ></activity>
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".StartActivity" />
@@ -41,6 +43,7 @@
             android:name=".UsersActivity"
             android:parentActivityName=".MainActivity" />
         <activity android:name=".ProfileActivity"></activity>
+
     </application>
 
 </manifest>

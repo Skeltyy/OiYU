@@ -98,11 +98,10 @@ public class SettingsActivity extends AppCompatActivity {
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
-        String current_uid = mCurrentUser.getUid();
-
-
+        final String current_uid = mCurrentUser.getUid();
         mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(current_uid);
         mUserDatabase.keepSynced(true);
+
         mUserDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -115,15 +114,15 @@ public class SettingsActivity extends AppCompatActivity {
                 mName.setText(name);
                 mStatus.setText(status);
 
-                Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
+               Picasso.with(SettingsActivity.this).load(image).into(mDisplayImage);
 
                 //
-                if (image.equals("default")) {
+                if (!image.equals("default")) {
 
-
-                    //Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar_small).into(mDisplayImage);
+                    //Offline Capabilities
                     Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
-                            .placeholder(R.drawable.default_avatar_small).into(mDisplayImage, new Callback() {
+                            .placeholder(R.drawable.default_avatar_small).into(mDisplayImage,new Callback(){
+
                         @Override
                         public void onSuccess() {
 
@@ -131,11 +130,11 @@ public class SettingsActivity extends AppCompatActivity {
 
                         @Override
                         public void onError() {
-                            Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar_small).into(mDisplayImage);
-
+                            Picasso.with(SettingsActivity.this).load(image).placeholder
+                                    (R.drawable.default_avatar).into(mDisplayImage);;
                         }
                     });
-
+//@android:drawable/sym_def_app_icon
                 }
             }
 
@@ -195,37 +194,38 @@ public class SettingsActivity extends AppCompatActivity {
 
                 StorageReference filePath = mImageStorage.child("profile_images").child(current_user_id + ".jpg");
 
-          filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-              @Override
-             public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
-                  if (task.isSuccessful()){
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()){
 
-                       String download_url=task.getResult().getDownloadUrl().toString();
+                            String download_url=task.getResult().getDownloadUrl().toString();
 
-                          mUserDatabase.child("image").setValue(download_url).addOnCompleteListener(new OnCompleteListener<Void>() {
-                           @Override
-                          public void onComplete(@NonNull Task<Void> task) {
-                              if (task.isSuccessful()){
-                                  mProgressDialog.dismiss();
-                                  Toast.makeText(SettingsActivity.this, "Upload Successful",Toast.LENGTH_LONG).show();
-                              }
-                         }
-                   });
+                            mUserDatabase.child("image").setValue(download_url).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()){
+                                        mProgressDialog.dismiss();
+                                        Toast.makeText(SettingsActivity.this, "Upload Successful",Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
 
 
-         }else{
-             Toast.makeText(SettingsActivity.this,"Error in uploading",Toast.LENGTH_LONG).show();
-                          mProgressDialog.dismiss();
-                      }
-                   }
-             });
+                        }else{
+                            Toast.makeText(SettingsActivity.this,"Error in uploading",Toast.LENGTH_LONG).show();
+                            mProgressDialog.dismiss();
+                        }
+                    }
+                });
 
-         }else if (resultCode==CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
-             Exception error=result.getError();
-         }
-     }
- }
+            }else if (resultCode==CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
+                Exception error=result.getError();
+            }
+        }
+    }
 
-       }
+}
+
 
 
