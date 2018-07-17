@@ -11,6 +11,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,12 +21,22 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private TabLayout mTabLayout;
+    FirebaseUser currentUser;
+    private DatabaseReference userReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth=FirebaseAuth.getInstance();
+
+        currentUser=mAuth.getCurrentUser();
+
+        if (currentUser!=null) {
+            String online_user_id=mAuth.getCurrentUser().getUid();
+            userReference= FirebaseDatabase.getInstance().getReference().child("Users").child(online_user_id);
+        }
+
 
 //        mToolBar= (Toolbar) findViewById(R.id.main_page_toolbar);
 //        setSupportActionBar(mToolBar);
@@ -39,15 +51,26 @@ public class MainActivity extends AppCompatActivity {
     public void onStart(){
         super.onStart();
 
-        FirebaseUser currentUser=mAuth.getCurrentUser();
+        currentUser=mAuth.getCurrentUser();
 
         if (currentUser==null){
             sentToStart();
+        }else if (currentUser!=null){
+            userReference.child("online").setValue(true);//If user is online, this will be true
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (currentUser!=null){
+            userReference.child("online").setValue(false);//If user minimizes the app, the status is offline
         }
     }
 
     private void sentToStart() {
         Intent startIntent=new Intent(MainActivity.this, StartActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(startIntent);
         finish();
     }
