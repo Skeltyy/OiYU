@@ -13,6 +13,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
+import javax.net.ssl.SSLEngineResult;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentUser==null){
             sentToStart();
         }else if (currentUser!=null){
-            userReference.child("online").setValue(true);//If user is online, this will be true
+            userReference.child("online").setValue("true");//If user is online, this will be true
         }
     }
 
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         if (currentUser!=null){
-            userReference.child("online").setValue(false);//If user minimizes the app, the status is offline
+            userReference.child("online").setValue(ServerValue.TIMESTAMP);//If user minimizes the app, the status is offline
         }
     }
 
@@ -95,8 +98,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(accountIntent);
         }
         if(id== R.id.logout) {
+            if (currentUser!=null){
+                userReference.child("online").setValue(ServerValue.TIMESTAMP);
+            }
             FirebaseAuth.getInstance().signOut();
             sentToStart();
+
         }
 
         if (id == R.id.all_users) {

@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -121,12 +123,12 @@ public class FriendsFragment extends Fragment {
                final String user_id=getRef(position).getKey();
                 usersReference.child(user_id).addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
                         final String userName=dataSnapshot.child("name").getValue().toString();
                         String image=dataSnapshot.child("image").getValue().toString();
 
                         if (dataSnapshot.hasChild("online")){
-                            Boolean online_Status=(boolean) dataSnapshot.child("online").getValue();
+                            String online_Status=(String) dataSnapshot.child("online").getValue().toString();
                             holder.setUserOnline(online_Status);
                         }
                         holder.setName(userName);
@@ -150,10 +152,22 @@ public class FriendsFragment extends Fragment {
                                             startActivity(profileIntent);
                                         }
                                         if (position==1){
-                                            Intent chatIntent=new Intent(getContext(), ChatActivity.class);
-                                            chatIntent.putExtra("user_id",user_id);
-                                            chatIntent.putExtra("user_name",userName);
-                                            startActivity(chatIntent);
+                                            if (dataSnapshot.child("online").exists()){
+                                                Intent chatIntent=new Intent(getContext(), ChatActivity.class);
+                                                chatIntent.putExtra("user_id",user_id);
+                                                chatIntent.putExtra("user_name",userName);
+                                                startActivity(chatIntent);
+                                            }else{
+                                                usersReference.child(user_id).child("online").setValue(ServerValue.TIMESTAMP).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Intent chatIntent=new Intent(getContext(), ChatActivity.class);
+                                                        chatIntent.putExtra("user_id",user_id);
+                                                        chatIntent.putExtra("user_name",userName);
+                                                        startActivity(chatIntent);
+                                                    }
+                                                });
+                                            }
                                         }
                                     }
                                 });
@@ -208,10 +222,10 @@ public class FriendsFragment extends Fragment {
             Picasso.with(ctx).load(image).placeholder(R.drawable.default_avatar).into(userImage);
         }
 
-        public void setUserOnline(Boolean online_Status) {
+        public void setUserOnline(String online_Status) {
             ImageView onlineStatusView=(ImageView) mView.findViewById(R.id.online_status);
 
-            if (online_Status==true){
+            if (online_Status.equals("true")){
                 onlineStatusView.setVisibility(View.VISIBLE);
             }else {
                 onlineStatusView.setVisibility(View.INVISIBLE);
