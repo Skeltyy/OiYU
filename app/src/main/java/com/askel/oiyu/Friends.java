@@ -4,6 +4,7 @@ public class Friends {
     private String name;
     private String image;
     private String status;
+    private String mCurrentUser;
     public Friends(){
 
     }
@@ -13,12 +14,16 @@ public class Friends {
         this.status=status;
     }
 
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+    public void setUserId(String userID){
+        this.mCurrentUser=userID;
     }
 
     public String getImage() {
@@ -35,5 +40,8 @@ public class Friends {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public String  getCurrentUser(){
+        return mCurrentUser;
     }
 }

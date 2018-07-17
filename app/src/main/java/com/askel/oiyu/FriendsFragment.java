@@ -16,9 +16,13 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -30,10 +34,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class FriendsFragment extends Fragment {
     private RecyclerView mFriendsList;
     private DatabaseReference mFriendsDatabase;
+    private DatabaseReference usersReference;
 
     private FirebaseAuth mAuth;
 
-    private String mCurrentUser_id;
+    private String  mCurrentUser_id;
+
 
     private View mMainView;
 
@@ -45,6 +51,7 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflator,ViewGroup container,Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         mMainView=inflator.inflate(R.layout.fragment_friends,container,false);
 
         mFriendsList=mMainView.findViewById(R.id.friends_list);
@@ -53,8 +60,15 @@ public class FriendsFragment extends Fragment {
         mAuth=FirebaseAuth.getInstance();
 
         mCurrentUser_id=mAuth.getCurrentUser().getUid();
+       // final String current_uid = mCurrentUser_id.getUid();
 
-        mFriendsDatabase=FirebaseDatabase.getInstance().getReference().child("Friends").child(mCurrentUser_id);
+
+
+
+
+//        userID.setUserId(mCurrentUser_id);
+        mFriendsDatabase=FirebaseDatabase.getInstance().getReference("Friends").child(mCurrentUser_id);
+        usersReference=FirebaseDatabase.getInstance().getReference().child("Users");
 
         return mMainView;
     }
@@ -67,10 +81,15 @@ public class FriendsFragment extends Fragment {
     }
 
     public void startListening() {
+
+       // final String friendsID=usersReference.getKey();
+
+
+
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("Friends")
-                .limitToLast(50);
+                .child("Friends");
+
 
         FirebaseRecyclerOptions<Friends> options =
                 new FirebaseRecyclerOptions.Builder<Friends>()
@@ -89,19 +108,34 @@ public class FriendsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(FriendsViewHolder holder, int position, Friends model) {
+            protected void onBindViewHolder(final FriendsViewHolder holder, int position, Friends model) {
                 // Bind the Chat object to the ChatHolder
-                holder.setName(model.getName());
+               // holder.setName(model.getName());
               //  holder.setImage(model.getImage(),getApplicationContext());
 
-                final String user_id=getRef(position).getKey();
+               final String user_id=getRef(position).getKey();
+                usersReference.child(user_id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String userName=dataSnapshot.child("name").getValue().toString();
+                        String image=dataSnapshot.child("image").getValue().toString();
+                        holder.setName(userName);
+                        holder.setImage(image,getContext());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
                 holder.mView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //Intent profileIntent=new Intent(FriendsFragment.this, Friends.class);
-                        //profileIntent.putExtra("user_id",user_id);
-                        //startActivity(profileIntent);
+                        Intent profileIntent=new Intent(getActivity(), ProfileActivity.class);
+                        profileIntent.putExtra("user_id",user_id);
+                        startActivity(profileIntent);
                     }
                 });
                 // ...
@@ -116,7 +150,7 @@ public class FriendsFragment extends Fragment {
 
 
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
-        View mView;
+         View mView;
 
         public FriendsViewHolder(View itemView) {
             super(itemView);

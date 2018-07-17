@@ -248,6 +248,7 @@ public class ProfileActivity extends AppCompatActivity {
                                                             mCurrent_state = "friends";
                                                             mProfileSendRequestBtn.setText("UnFriend");
 
+
                                                             mDeclineBtn.setEnabled(false);
                                                             mDeclineBtn.setVisibility(View.INVISIBLE);
                                                         }
