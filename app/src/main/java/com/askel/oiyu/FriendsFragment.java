@@ -44,7 +44,7 @@ public class FriendsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
 
-    private FirebaseUser  mCurrentUser_id;
+    String  online_User_Id;
 
 
     private View mMainView;
@@ -61,21 +61,18 @@ public class FriendsFragment extends Fragment {
         mMainView=inflator.inflate(R.layout.fragment_friends,container,false);
 
         mFriendsList=mMainView.findViewById(R.id.friends_list);
+
+        mAuth=FirebaseAuth.getInstance();
+        online_User_Id=mAuth.getCurrentUser().getUid();
+
+        mFriendsDatabase=FirebaseDatabase.getInstance().getReference().child("Friends").child(online_User_Id);
+        usersReference=FirebaseDatabase.getInstance().getReference().child("Users");
+
         mFriendsList.setHasFixedSize(true);
         mFriendsList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAuth=FirebaseAuth.getInstance();
-        mCurrentUser_id = FirebaseAuth.getInstance().getCurrentUser();
-
-
-       // final String current_uid = mCurrentUser_id.getUid();
 
 
 
-
-
-//        userID.setUserId(mCurrentUser_id);
-        mFriendsDatabase=FirebaseDatabase.getInstance().getReference("Friends").child("user_id");
-        usersReference=FirebaseDatabase.getInstance().getReference().child("Users");
 
         return mMainView;
     }
@@ -88,9 +85,6 @@ public class FriendsFragment extends Fragment {
     }
 
     public void startListening() {
-
-       final String friendsID=usersReference.getKey();
-
 
 
         Query query = FirebaseDatabase.getInstance()
@@ -125,7 +119,8 @@ public class FriendsFragment extends Fragment {
                     @Override
                     public void onDataChange(final DataSnapshot dataSnapshot) {
                         final String userName=dataSnapshot.child("name").getValue().toString();
-                        String image=dataSnapshot.child("image").getValue().toString();
+                        final String image=dataSnapshot.child("image").getValue().toString();
+                        final String status=dataSnapshot.child("status").getValue().toString();
 
                         if (dataSnapshot.hasChild("online")){
                             String online_Status=(String) dataSnapshot.child("online").getValue().toString();
@@ -133,6 +128,7 @@ public class FriendsFragment extends Fragment {
                         }
                         holder.setName(userName);
                         holder.setImage(image,getContext());
+                        holder.setStatus(status);
                         holder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -202,11 +198,16 @@ public class FriendsFragment extends Fragment {
 
 
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
-         View mView;
+        View mView;
 
         public FriendsViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
+        }
+
+        public void setDate(String date){
+            TextView sinceFriendsDate=(TextView) mView.findViewById(R.id.user_single_status);
+            sinceFriendsDate.setText("Friends since: "+date);
         }
 
         public void setName(String name) {
