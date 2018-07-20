@@ -35,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
+ * Todo-Fix the fragment as its showing all contents and not by userID//
  * A simple {@link Fragment} subclass.
  */
 public class FriendsFragment extends Fragment {
@@ -69,7 +70,10 @@ public class FriendsFragment extends Fragment {
         usersReference=FirebaseDatabase.getInstance().getReference().child("Users");
 
         mFriendsList.setHasFixedSize(true);
-        mFriendsList.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        mFriendsList.setLayoutManager(linearLayoutManager);
 
 
 
@@ -85,8 +89,6 @@ public class FriendsFragment extends Fragment {
     }
 
     public void startListening() {
-
-
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("Friends");
@@ -96,6 +98,17 @@ public class FriendsFragment extends Fragment {
                 new FirebaseRecyclerOptions.Builder<Friends>()
                         .setQuery(query, Friends.class)
                         .build();
+
+
+//        Query query = FirebaseDatabase.getInstance()
+//                .getReference()
+//                .child("Friends");
+//
+//
+//        FirebaseRecyclerOptions<Friends> options =
+//                new FirebaseRecyclerOptions.Builder<Friends>()
+//                        .setQuery(query, Friends.class)
+//                        .build();
         FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Friends, FriendsViewHolder>(options) {
 
             @Override
@@ -110,9 +123,7 @@ public class FriendsFragment extends Fragment {
 
             @Override
             protected void onBindViewHolder(final FriendsViewHolder holder, int position, Friends model) {
-                // Bind the Chat object to the ChatHolder
-               // holder.setName(model.getName());
-              //  holder.setImage(model.getImage(),getApplicationContext());
+
 
                final String user_id=getRef(position).getKey();
                 usersReference.child(user_id).addValueEventListener(new ValueEventListener() {
@@ -170,9 +181,7 @@ public class FriendsFragment extends Fragment {
                                 builder.show();
 
 
-//                                Intent profileIntent=new Intent(getActivity(), ProfileActivity.class);
-//                                profileIntent.putExtra("user_id",user_id);
-//                                startActivity(profileIntent);
+//
                             }
                         });
 
