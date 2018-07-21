@@ -62,7 +62,8 @@ public class ChatsFragment extends Fragment {
         mAuth=FirebaseAuth.getInstance();
         online_user_id=mAuth.getCurrentUser().getUid();
 
-        FriendsReference= FirebaseDatabase.getInstance().getReference().child("Friends").child(online_user_id);
+        FriendsReference= FirebaseDatabase.getInstance().getReference().child("Friends")
+                .child(online_user_id);
         UsersReference=FirebaseDatabase.getInstance().getReference().child("Users");
         myChatsList.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
@@ -73,7 +74,7 @@ public class ChatsFragment extends Fragment {
         // Inflate the layout for this fragment
         return myMainView;
     }
-
+////////////////////////////////////Retrieves the Chats from Firebase////////////////////////////////////////////////////////////////
     @Override
     public void onStart() {
         super.onStart();
@@ -86,7 +87,8 @@ public class ChatsFragment extends Fragment {
                 new FirebaseRecyclerOptions.Builder<Chats>()
                         .setQuery(query, Chats.class)
                         .build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Chats, ChatsViewHolder>(options) {
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Chats, ChatsViewHolder>
+                (options) {
 
             @Override
             public ChatsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -99,10 +101,10 @@ public class ChatsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(final ChatsViewHolder holder, int position, Chats model) {
+            protected void onBindViewHolder(final ChatsViewHolder holder, int position,
+                                            Chats model) {
                 // Bind the Chat object to the ChatHolder
-                // holder.setName(model.getName());
-                //  holder.setImage(model.getImage(),getApplicationContext());
+
 
                 final String user_id=getRef(position).getKey();
                 UsersReference.child(user_id).addValueEventListener(new ValueEventListener() {
@@ -113,7 +115,8 @@ public class ChatsFragment extends Fragment {
                         String userStatus=dataSnapshot.child("status").getValue().toString();
 
                         if (dataSnapshot.hasChild("online")){
-                            String online_Status=(String) dataSnapshot.child("online").getValue().toString();
+                            String online_Status=(String) dataSnapshot.child("online").getValue()
+                                    .toString();
                             holder.setUserOnline(online_Status);
                         }
                         holder.setName(userName);
@@ -129,10 +132,13 @@ public class ChatsFragment extends Fragment {
                                     chatIntent.putExtra("user_name",userName);
                                     startActivity(chatIntent);
                                 }else{
-                                    UsersReference.child(user_id).child("online").setValue(ServerValue.TIMESTAMP).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    UsersReference.child(user_id).child("online")
+                                            .setValue(ServerValue.TIMESTAMP)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
-                                            Intent chatIntent=new Intent(getContext(), ChatActivity.class);
+                                            Intent chatIntent=new Intent(getContext()
+                                                    , ChatActivity.class);
                                             chatIntent.putExtra("user_id",user_id);
                                             chatIntent.putExtra("user_name",userName);
                                             startActivity(chatIntent);
@@ -161,6 +167,7 @@ public class ChatsFragment extends Fragment {
         adapter.startListening();
     }
 
+    ////////////////////////////////////////Creating the Holder/////////////////////////////////////////////////////
     public static class ChatsViewHolder extends RecyclerView.ViewHolder {
         View mView;
 

@@ -2,7 +2,7 @@ package com.askel.oiyu;
 
 import android.app.Application;
 import android.content.Context;
-
+//Sets up the Last seen time feature called in other classes
 public class LastSeenTime extends Application {
     /*
      * Copyright 2012 Google Inc.

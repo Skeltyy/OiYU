@@ -54,7 +54,8 @@ public class RegisterActivity extends AppCompatActivity {
                 String email=mEmail.getEditText().getText().toString();
                 String password=mPassword.getEditText().getText().toString();
 
-                if (!TextUtils.isEmpty(display_name)||!TextUtils.isEmpty(email)||!TextUtils.isEmpty(password)) {
+                if (!TextUtils.isEmpty(display_name)||!TextUtils.isEmpty(email)||!TextUtils
+                        .isEmpty(password)) {
                     mRegProcess.setTitle("Registering User");
                     mRegProcess.setMessage("Please wait while we create your account!");
                     mRegProcess.setCanceledOnTouchOutside(false);
@@ -89,8 +90,10 @@ public class RegisterActivity extends AppCompatActivity {
                             if (task.isSuccessful()){
                                  mRegProcess.dismiss();
 
-                                Intent mainIntent=new Intent(RegisterActivity.this, MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                Intent mainIntent=new Intent(RegisterActivity.this,
+                                        MainActivity.class);
+                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.
+                                        FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(mainIntent);
                                 finish();
                             }
@@ -101,15 +104,14 @@ public class RegisterActivity extends AppCompatActivity {
 
                 }else{
                     mRegProcess.hide();
-                    Toast.makeText(RegisterActivity.this, "Cannot Register your account. Please check your details and try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this,
+                            "Cannot Register your account. Please check your details and try again.",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
         });
 
     }
-//    public void returnToLogin(View view){
-//        Intent returnToLogin=new Intent(RegisterActivity.this, LoginActivity.class);
-//        startActivity(returnToLogin);
-//    }
+
 }

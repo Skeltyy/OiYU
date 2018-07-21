@@ -6,6 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <TextView
+        android:id="@+id/welcome_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="40dp"
+        android:text="  OiYU "
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:textColor="@color/colorPrimaryDark" />
+
+    <TextView
+        android:id="@+id/welcome_version"
+        android:layout_width="91dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/welcome_title"
+        android:layout_alignRight="@+id/welcome_title"
+        android:layout_below="@+id/welcome_title"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Version 1.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcome_title" />
+
     <android.support.design.widget.TextInputLayout
         android:id="@+id/login_login_email"
         android:layout_width="352dp"
@@ -44,7 +79,8 @@
             android:id="@+id/login_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password" />
+            android:hint="Password"
+            android:password="true" />
 
     </android.support.design.widget.TextInputLayout>
 
@@ -59,7 +95,7 @@
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome_version" />
 
     <Button
         android:id="@+id/lgn_login_btn"

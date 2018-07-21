@@ -86,15 +86,18 @@ public class ProfileActivity extends AppCompatActivity {
                 mProfileName.setText(display_name);
                 mProfileStatus.setText(status);
 
-                Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avatar).into(mProfileImage);
+                Picasso.with(ProfileActivity.this).load(image).placeholder(
+                        R.drawable.default_avatar).into(mProfileImage);
 
                 //------------------Friends List/Request Feature-------------------------------//
 
-                mFriendReqDatabase.child(mCurrent_user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                mFriendReqDatabase.child(mCurrent_user.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.hasChild(user_id)) {
-                            String req_type = dataSnapshot.child(user_id).child("request_type").getValue().toString();
+                            String req_type = dataSnapshot.child(user_id).child("request_type")
+                                    .getValue().toString();
                             if (req_type.equals("recieved")) {
 
                                 mCurrent_state = "req_recieved";
@@ -112,7 +115,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                         } else {
 
-                            mFriendDatabase.child(mCurrent_user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            mFriendDatabase.child(mCurrent_user.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.hasChild(user_id)) {
@@ -165,21 +169,28 @@ public class ProfileActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
-                                        mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).child("request_type")
-                                                .setValue("recieved").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        mFriendReqDatabase.child(user_id)
+                                                .child(mCurrent_user.getUid()).child("request_type")
+                                                .setValue("recieved").addOnSuccessListener(
+                                                        new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
 
-                                                HashMap<String, String> notificationData = new HashMap<>();
+                                                HashMap<String, String> notificationData = new
+                                                        HashMap<>();
                                                 notificationData.put("from", mCurrent_user.getUid());
                                                 notificationData.put("type", "request");
 
-                                                mNotificationDatabase.child(user_id).push().setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                mNotificationDatabase.child(user_id).push()
+                                                        .setValue(notificationData)
+                                                        .addOnSuccessListener(
+                                                                new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
 
                                                         mCurrent_state = "req_sent";
-                                                        mProfileSendRequestBtn.setText("Cancel Friend Request");
+                                                        mProfileSendRequestBtn
+                                                                .setText("Cancel Friend Request");
                                                         mDeclineBtn.setVisibility(View.INVISIBLE);
                                                         mDeclineBtn.setEnabled(false);
                                                     }
@@ -190,7 +201,9 @@ public class ProfileActivity extends AppCompatActivity {
                                             }
                                         });
                                     } else {
-                                        Toast.makeText(ProfileActivity.this, "Failed Sending Request", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ProfileActivity.this,
+                                                "Failed Sending Request", Toast.LENGTH_SHORT)
+                                                .show();
                                     }
                                     mProfileSendRequestBtn.setEnabled(true);
                                 }
@@ -199,10 +212,14 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 //------------------------------------Cancel Request State
                 if (mCurrent_state.equals("req_sent")) {
-                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id)
+                            .removeValue()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid())
+                                    .removeValue()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
 
@@ -229,18 +246,26 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 public void onSuccess(Void aVoid) {
                                     mFriendDatabase.child(user_id).child(mCurrent_user.getUid())
-                                            .setValue(currentDate).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            .setValue(currentDate).addOnSuccessListener(
+                                                    new OnSuccessListener<Void>() {
                                         @Override
 
                                         public void onSuccess(Void aVoid) {
-                                            mFriendReqDatabase.child(mCurrent_user.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            mFriendReqDatabase.child(mCurrent_user.getUid())
+                                                    .child(user_id)
+                                                    .removeValue()
+                                                    .addOnSuccessListener(
+                                                            new OnSuccessListener<Void>() {
                                                 @Override
 
                                                 public void onSuccess(Void aVoid) {
 
 
-                                                    mFriendReqDatabase.child(user_id).child(mCurrent_user.getUid())
-                                                            .removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    mFriendReqDatabase.child(user_id)
+                                                            .child(mCurrent_user.getUid())
+                                                            .removeValue()
+                                                            .addOnSuccessListener(
+                                                                    new OnSuccessListener<Void>() {
                                                         @Override
 
                                                         public void onSuccess(Void aVoid) {

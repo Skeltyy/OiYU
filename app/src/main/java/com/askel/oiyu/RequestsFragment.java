@@ -4,9 +4,7 @@ package com.askel.oiyu;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,15 +27,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -52,7 +45,7 @@ public class RequestsFragment extends Fragment {
     private RecyclerView myRequestsList;
     private View myMainView;
 
-    private DatabaseReference friendsRequestReference, useraReference;
+    private DatabaseReference friendsRequestReference, userReference;
 
     private FirebaseAuth mAuth;
 
@@ -81,8 +74,9 @@ public class RequestsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         online_User_Id = mAuth.getCurrentUser().getUid();
 
-        friendsRequestReference = FirebaseDatabase.getInstance().getReference().child("Friend_req").child(online_User_Id);
-        useraReference = FirebaseDatabase.getInstance().getReference().child("Users");
+        friendsRequestReference = FirebaseDatabase.getInstance().getReference().child("Friend_req")
+                .child(online_User_Id);
+        userReference = FirebaseDatabase.getInstance().getReference().child("Users");
 
         FriendsDatabaseRef=FirebaseDatabase.getInstance().getReference().child("Friends");
         friendsRequestReference=FirebaseDatabase.getInstance().getReference().child("Friend_req");
@@ -120,7 +114,8 @@ public class RequestsFragment extends Fragment {
                 new FirebaseRecyclerOptions.Builder<Requests>()
                         .setQuery(query, Requests.class)
                         .build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Requests, RequestViewHolder>(options) {
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Requests,
+                RequestViewHolder>(options) {
 
             @Override
             public RequestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -133,7 +128,8 @@ public class RequestsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(final RequestViewHolder holder, int position, Requests model) {
+            protected void onBindViewHolder(final RequestViewHolder holder, int position,
+                                            Requests model) {
                 final String list_Users_Id = getRef(position).getKey();
 
                 final DatabaseReference get_Type_Ref=getRef(position).child("request_type").getRef();
@@ -144,12 +140,16 @@ public class RequestsFragment extends Fragment {
                             final String request_type=dataSnapshot.getValue().toString();
 
                             if (request_type.equals("recieved")){
-                                useraReference.child(list_Users_Id).addValueEventListener(new ValueEventListener() {
+                                userReference.child(list_Users_Id).addValueEventListener(
+                                        new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        final String userName = dataSnapshot.child("name").getValue().toString();
-                                        final String image = dataSnapshot.child("image").getValue().toString();
-                                        final String userStatus = dataSnapshot.child("status").getValue().toString();
+                                        final String userName = dataSnapshot.child("name")
+                                                .getValue().toString();
+                                        final String image = dataSnapshot.child("image")
+                                                .getValue().toString();
+                                        final String userStatus = dataSnapshot.child("status")
+                                                .getValue().toString();
 
                                         holder.setUserName(userName);
                                         holder.setImage(image, getContext());
@@ -163,7 +163,8 @@ public class RequestsFragment extends Fragment {
                                                         "Accept Friend Request","Cancel Friend Request"
                                                 };
 
-                                                AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+                                                AlertDialog.Builder builder=new AlertDialog.
+                                                        Builder(getContext());
                                                 builder.setTitle("Friend Request Options");
                                                 builder.setItems(options, new DialogInterface.OnClickListener() {
                                                     @Override
@@ -173,7 +174,9 @@ public class RequestsFragment extends Fragment {
 
                                                             if (mCurrent_state.equals("req_recieved")) {
 
-                                                                final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+                                                                final String currentDate = DateFormat.
+                                                                        getDateTimeInstance().format(
+                                                                                new Date());
 
                                                                 FriendsDatabaseRef.child(online_User_Id)
                                                                         .child(list_Users_Id).setValue(currentDate)
@@ -251,7 +254,7 @@ public class RequestsFragment extends Fragment {
 
                                 holder.mView.findViewById(R.id.request_decline_btn).setVisibility(View.INVISIBLE);
 
-                                useraReference.child(list_Users_Id).addValueEventListener(new ValueEventListener() {
+                                userReference.child(list_Users_Id).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         final String userName = dataSnapshot.child("name").getValue().toString();

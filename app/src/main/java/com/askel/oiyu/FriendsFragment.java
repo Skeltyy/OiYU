@@ -47,7 +47,6 @@ public class FriendsFragment extends Fragment {
 
     String  online_User_Id;
 
-
     private View mMainView;
 
     public FriendsFragment(){
@@ -58,7 +57,6 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflator,ViewGroup container,Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         mMainView=inflator.inflate(R.layout.fragment_friends,container,false);
 
         mFriendsList=mMainView.findViewById(R.id.friends_list);
@@ -66,7 +64,8 @@ public class FriendsFragment extends Fragment {
         mAuth=FirebaseAuth.getInstance();
         online_User_Id=mAuth.getCurrentUser().getUid();
 
-        mFriendsDatabase=FirebaseDatabase.getInstance().getReference().child("Friends").child(online_User_Id);
+        mFriendsDatabase=FirebaseDatabase.getInstance().getReference().child("Friends")
+                .child(online_User_Id);
         usersReference=FirebaseDatabase.getInstance().getReference().child("Users");
 
         mFriendsList.setHasFixedSize(true);
@@ -74,9 +73,6 @@ public class FriendsFragment extends Fragment {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         mFriendsList.setLayoutManager(linearLayoutManager);
-
-
-
 
         return mMainView;
     }
@@ -88,6 +84,7 @@ public class FriendsFragment extends Fragment {
 
     }
 
+    ////////////////////////////////////////Data Retrieval/////////////////////////////////////////////////////
     public void startListening() {
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
@@ -99,17 +96,8 @@ public class FriendsFragment extends Fragment {
                         .setQuery(query, Friends.class)
                         .build();
 
-
-//        Query query = FirebaseDatabase.getInstance()
-//                .getReference()
-//                .child("Friends");
-//
-//
-//        FirebaseRecyclerOptions<Friends> options =
-//                new FirebaseRecyclerOptions.Builder<Friends>()
-//                        .setQuery(query, Friends.class)
-//                        .build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Friends, FriendsViewHolder>(options) {
+        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Friends,
+                FriendsViewHolder>(options) {
 
             @Override
             public FriendsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -122,7 +110,8 @@ public class FriendsFragment extends Fragment {
             }
 
             @Override
-            protected void onBindViewHolder(final FriendsViewHolder holder, int position, Friends model) {
+            protected void onBindViewHolder(final FriendsViewHolder holder, int position,
+                                            Friends model) {
 
 
                final String user_id=getRef(position).getKey();
@@ -134,7 +123,8 @@ public class FriendsFragment extends Fragment {
                         final String status=dataSnapshot.child("status").getValue().toString();
 
                         if (dataSnapshot.hasChild("online")){
-                            String online_Status=(String) dataSnapshot.child("online").getValue().toString();
+                            String online_Status=(String) dataSnapshot.child("online").getValue()
+                                    .toString();
                             holder.setUserOnline(online_Status);
                         }
                         holder.setName(userName);
@@ -144,6 +134,7 @@ public class FriendsFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
 
+                                /////////////////////////////Options Menu//////////////////////////////////////
                                 CharSequence options[]=new CharSequence[]{
                                         userName+"'s Profile","Send Message"
                                 };
@@ -154,23 +145,30 @@ public class FriendsFragment extends Fragment {
                                     @Override
                                     public void onClick(DialogInterface dialog, int position) {
                                         if (position==0){
-                                            Intent profileIntent=new Intent(getContext(), ProfileActivity.class);
+                                            Intent profileIntent=new Intent(getContext(),
+                                                    ProfileActivity.class);
                                             profileIntent.putExtra("user_id",user_id);
                                             startActivity(profileIntent);
                                         }
                                         if (position==1){
                                             if (dataSnapshot.child("online").exists()){
-                                                Intent chatIntent=new Intent(getContext(), ChatActivity.class);
+                                                Intent chatIntent=new Intent(getContext(),
+                                                        ChatActivity.class);
                                                 chatIntent.putExtra("user_id",user_id);
                                                 chatIntent.putExtra("user_name",userName);
                                                 startActivity(chatIntent);
                                             }else{
-                                                usersReference.child(user_id).child("online").setValue(ServerValue.TIMESTAMP).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                usersReference.child(user_id).child("online")
+                                                        .setValue(ServerValue.TIMESTAMP)
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
                                                     public void onSuccess(Void aVoid) {
-                                                        Intent chatIntent=new Intent(getContext(), ChatActivity.class);
-                                                        chatIntent.putExtra("user_id",user_id);
-                                                        chatIntent.putExtra("user_name",userName);
+                                                        Intent chatIntent=new Intent(getContext()
+                                                                , ChatActivity.class);
+                                                        chatIntent.putExtra("user_id"
+                                                                ,user_id);
+                                                        chatIntent.putExtra("user_name",
+                                                                userName);
                                                         startActivity(chatIntent);
                                                     }
                                                 });
@@ -203,6 +201,9 @@ public class FriendsFragment extends Fragment {
         mFriendsList.setAdapter(adapter);
         adapter.startListening();
     }
+
+
+
 
 
 

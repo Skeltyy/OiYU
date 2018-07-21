@@ -1,5 +1,5 @@
 package com.askel.oiyu;
-
+//Getters and Setters used in ChatActivity
 public class Chats {
     private String status;
 

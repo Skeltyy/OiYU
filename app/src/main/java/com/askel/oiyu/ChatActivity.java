@@ -49,16 +49,13 @@ public class ChatActivity extends AppCompatActivity {
 
     private String messageReceiverID;
     private String messageReceiverName;
-    private Toolbar ChatToolBar;
+
     private TextView userNameTitle;
     private TextView userLastSeen;
     private CircleImageView userChatProfileImage;
 
     private ImageButton SendMessageButton,SelectImageButton;
     private EditText InputMessageText;
-
-
-
 
     private DatabaseReference rootRef;
 
@@ -197,7 +194,10 @@ public class ChatActivity extends AppCompatActivity {
             DatabaseReference user_message_key=rootRef.child("Messages").child(messageReceiverID).push();
             final String message_Push_Id=user_message_key.getKey();
 
-            StorageReference filePath=messageImageStorageRef.child("Messages_Pictures").child(message_Push_Id+".jpg");
+
+            ///////////////////////////////////Sending Images-Not yet Operational///////////////////////////////////////////////////
+            StorageReference filePath=messageImageStorageRef.child("Messages_Pictures")
+                    .child(message_Push_Id+".jpg");
             filePath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -214,12 +214,16 @@ public class ChatActivity extends AppCompatActivity {
                         //messageTextBody.put("from",messageSenderID);
 
                         Map messageBodyDetails=new HashMap();
-                        messageBodyDetails.put(message_sender_ref+"/"+message_Push_Id,messageTextBody);
-                        messageBodyDetails.put(message_receiver_ref+"/"+message_Push_Id,messageTextBody);
+                        messageBodyDetails.put(message_sender_ref+"/"+message_Push_Id,
+                                messageTextBody);
+                        messageBodyDetails.put(message_receiver_ref+"/"+message_Push_Id,
+                                messageTextBody);
 
-                        rootRef.updateChildren(messageBodyDetails, new DatabaseReference.CompletionListener() {
+                        rootRef.updateChildren(messageBodyDetails,
+                                new DatabaseReference.CompletionListener() {
                             @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            public void onComplete(DatabaseError databaseError,
+                                                   DatabaseReference databaseReference) {
                                 if (databaseError!=null){
                                     Log.d("Chat_Log",databaseError.getMessage().toString());
                                 }
@@ -229,10 +233,12 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
 
-                        Toast.makeText(ChatActivity.this, "Picture sent successfully",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatActivity.this, "Picture sent successfully",
+                                Toast.LENGTH_SHORT).show();
                         loadingBar.dismiss();
                     }else{
-                        Toast.makeText(ChatActivity.this, "Upload failed. Please try again.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ChatActivity.this,
+                                "Upload failed. Please try again.",Toast.LENGTH_SHORT).show();
                         loadingBar.dismiss();
                     }
                 }
@@ -242,7 +248,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void FetchMessages() {
-        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID).addChildEventListener(new ChildEventListener() {
+        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+                .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages=dataSnapshot.getValue(Messages.class);
@@ -273,21 +280,23 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-
+////////////////////////////////////////////Sending Messages-Operational/////////////////////////////////////////////////////////
     private void SendMessage() {
         String messageText=InputMessageText.getText().toString();
         if (TextUtils.isEmpty(messageText)){
-            Toast.makeText(ChatActivity.this,"Please enter a message.",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ChatActivity.this,"Please enter a message.",
+                    Toast.LENGTH_SHORT).show();
         }else{
             String message_sender_ref="Messages/"+messageSenderID+"/"+messageReceiverID;
 
             String message_receiver_ref="Messages/"+messageReceiverID+"/"+messageSenderID;
 
-            DatabaseReference  user_message_key=rootRef.child("Messages").child(messageSenderID).child(messageReceiverID).push();
+            DatabaseReference  user_message_key=rootRef.child("Messages").child(messageSenderID)
+                    .child(messageReceiverID).push();
 
             String message_push_id=user_message_key.getKey();
 
-            Map messageTextBody=new HashMap();
+            Map messageTextBody=new HashMap();//Writes to Firebase
             messageTextBody.put("message",messageText);
             messageTextBody.put("seen",false);
             messageTextBody.put("type","text");

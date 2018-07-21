@@ -12,6 +12,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
+//Offline Capabilities
 
 public class OiYU extends Application {
 

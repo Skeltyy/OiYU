@@ -37,13 +37,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentUser!=null) {
             String online_user_id=mAuth.getCurrentUser().getUid();
-            userReference= FirebaseDatabase.getInstance().getReference().child("Users").child(online_user_id);
+            userReference= FirebaseDatabase.getInstance().getReference().child("Users")
+                    .child(online_user_id);
         }
 
 
-//        mToolBar= (Toolbar) findViewById(R.id.main_page_toolbar);
-//        setSupportActionBar(mToolBar);
-//        getSupportActionBar().setTitle("OiYU");
+
         mViewPager=(ViewPager) findViewById(R.id.main_tabPager);
         mSectionsPagerAdapter=new SectionsPagerAdapter(getSupportFragmentManager());
 

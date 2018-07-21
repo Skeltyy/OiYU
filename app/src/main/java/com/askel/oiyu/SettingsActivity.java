@@ -174,7 +174,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
-            CropImage.activity(imageUri).setAspectRatio(1, 1).setMinCropWindowSize(500, 500).start(this);
+            CropImage.activity(imageUri).setAspectRatio(1, 1)
+                    .setMinCropWindowSize(500, 500).start(this);
             //Toast.makeText(SettingsActivity.this, imageUri,Toast.LENGTH_LONG).show();
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

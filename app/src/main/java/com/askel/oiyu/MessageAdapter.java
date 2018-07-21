@@ -36,6 +36,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         return new MessageViewHolder(v);
     }
 
+
+    ///////////////////////////////////Message View-Displaying Messages///////////////////////////////////////////////////////////
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onBindViewHolder(MessageViewHolder holder, int position){
@@ -46,13 +48,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if(Objects.equals(fromUserId, message_sender_id))
         {
-            holder.messageText.setBackgroundResource(R.drawable.message_text_background_two);
-            holder.messageText.setTextColor(Color.BLACK);
-            holder.messageText.setGravity(Gravity.RIGHT);
-        }else{
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
             holder.messageText.setGravity(Gravity.LEFT);
+
+        }else{
+            holder.messageText.setBackgroundResource(R.drawable.message_text_background_two);
+            holder.messageText.setTextColor(Color.BLACK);
+            holder.messageText.setGravity(Gravity.RIGHT);
+
         }
         holder.messageText.setText(messages.getMessage());
     }
