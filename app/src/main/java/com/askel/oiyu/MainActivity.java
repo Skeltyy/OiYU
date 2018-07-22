@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout=(TabLayout) findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
     }
-    public void onStart(){
-        super.onStart();
+    public void onResume(){
+        super.onResume();
 
         currentUser=mAuth.getCurrentUser();
 
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (currentUser!=null){
             userReference.child("online").setValue(ServerValue.TIMESTAMP);//If user minimizes the app, the status is offline
         }

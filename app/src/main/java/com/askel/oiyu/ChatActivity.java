@@ -91,7 +91,7 @@ public class ChatActivity extends AppCompatActivity {
         currentUser=mAuth.getCurrentUser();
         if (currentUser!=null) {
             String online_user_id=mAuth.getCurrentUser().getUid();
-            userReference= FirebaseDatabase.getInstance().getReference().child("Users")
+            userReference= rootRef.child("Users")
                     .child(online_user_id);
         }
 
@@ -141,8 +141,6 @@ public class ChatActivity extends AppCompatActivity {
 
         userNameTitle.setText(messageReceiverName);
 
-//        rootRef.child("online").setValue("true");//If user is online, this will be true
-
         rootRef.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -191,13 +189,13 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    public void onStart(){
-        super.onStart();
+    public void onResume(){
+        super.onResume();
 
         currentUser=mAuth.getCurrentUser();
 
         if (currentUser==null){
-            //sentToStart();
+            sentToStart();
         }else if (currentUser!=null){
             userReference.child("online").setValue("true");//If user is online, this will be true
 
@@ -205,11 +203,18 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (currentUser!=null){
             userReference.child("online").setValue(ServerValue.TIMESTAMP);//If user minimizes the app, the status is offline
         }
+    }
+
+    private void sentToStart() {
+        Intent startIntent=new Intent(ChatActivity.this, StartActivity.class);
+        startIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(startIntent);
+        finish();
     }
 
     @Override
