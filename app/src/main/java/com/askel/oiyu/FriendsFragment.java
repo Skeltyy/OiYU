@@ -236,7 +236,7 @@ public class FriendsFragment extends Fragment {
         public void setUserOnline(String online_Status) {
             ImageView onlineStatusView=(ImageView) mView.findViewById(R.id.online_status);
 
-            if (online_Status.equals("true")){
+            if (online_Status.equals("true") || online_Status.equals("inchat")){
                 onlineStatusView.setVisibility(View.VISIBLE);
             }else {
                 onlineStatusView.setVisibility(View.INVISIBLE);
