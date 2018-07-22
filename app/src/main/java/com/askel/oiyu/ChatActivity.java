@@ -75,6 +75,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private ProgressDialog loadingBar;
 
+    private FirebaseUser currentUser;
+    private DatabaseReference userReference;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +86,14 @@ public class ChatActivity extends AppCompatActivity {
 
         rootRef= FirebaseDatabase.getInstance().getReference();
         mAuth=FirebaseAuth.getInstance();
+
+        currentUser=mAuth.getCurrentUser();
+        if (currentUser!=null) {
+            String online_user_id=mAuth.getCurrentUser().getUid();
+            userReference= FirebaseDatabase.getInstance().getReference().child("Users")
+                    .child(online_user_id);
+        }
+
         messageSenderID=mAuth.getCurrentUser().getUid();
 
 
@@ -128,7 +140,7 @@ public class ChatActivity extends AppCompatActivity {
 
         userNameTitle.setText(messageReceiverName);
 
-        rootRef.child("online").setValue("true");//If user is online, this will be true
+//        rootRef.child("online").setValue("true");//If user is online, this will be true
 
         rootRef.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -176,6 +188,27 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(galleryIntent,Gallery_Pick);
             }
         });
+    }
+
+    public void onStart(){
+        super.onStart();
+
+        currentUser=mAuth.getCurrentUser();
+
+        if (currentUser==null){
+            sentToStart();
+        }else if (currentUser!=null){
+            userReference.child("online").setValue("true");//If user is online, this will be true
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (currentUser!=null){
+            userReference.child("online").setValue(ServerValue.TIMESTAMP);//If user minimizes the app, the status is offline
+        }
     }
 
     @Override
