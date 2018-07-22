@@ -130,6 +130,7 @@ public class ChatsFragment extends Fragment {
                                     Intent chatIntent=new Intent(getContext(), ChatActivity.class);
                                     chatIntent.putExtra("user_id",user_id);
                                     chatIntent.putExtra("user_name",userName);
+                                    chatIntent.putExtra("online",true);
                                     startActivity(chatIntent);
                                 }else{
                                     UsersReference.child(user_id).child("online")

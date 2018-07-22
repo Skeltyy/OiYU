@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
             sentToStart();
         }else if (currentUser!=null){
             userReference.child("online").setValue("true");//If user is online, this will be true
+
         }
     }
 

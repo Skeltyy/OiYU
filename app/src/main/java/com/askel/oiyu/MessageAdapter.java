@@ -12,6 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +27,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
     private List<Messages>userMessagesList;
     private FirebaseAuth mAuth;
+    private DatabaseReference usersReference;
+    private FirebaseUser currentUser;
+    private TextView userLastSeen;
 
 
     public MessageAdapter(List<Messages>userMessagesList){
@@ -33,6 +42,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.messages_layout_of_user,parent,false);
         mAuth=FirebaseAuth.getInstance();
+        if (currentUser!=null){
+            String onlineUserId=mAuth.getCurrentUser().getUid();
+            usersReference=FirebaseDatabase.getInstance().getReference().child("Users").child(onlineUserId);
+            usersReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+
+
+
+
+
         return new MessageViewHolder(v);
     }
 
@@ -50,12 +80,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         {
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
-            holder.messageText.setGravity(Gravity.LEFT);
+            holder.messageText.setGravity(Gravity.START);
 
         }else{
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_two);
             holder.messageText.setTextColor(Color.BLACK);
-            holder.messageText.setGravity(Gravity.RIGHT);
+            holder.messageText.setGravity(Gravity.END);
 
         }
         holder.messageText.setText(messages.getMessage());
@@ -73,6 +103,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             super(view);
 
             messageText=(TextView) view.findViewById(R.id.message_text);
+
             //userProfileImage=(CircleImageView) view.findViewById(R.id.messages_profile_image);
         }
     }

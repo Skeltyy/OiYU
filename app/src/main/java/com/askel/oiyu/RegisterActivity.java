@@ -25,8 +25,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private TextInputLayout mDisplayName;
     private TextInputLayout mEmail;
-    private TextInputLayout mPassword;
+    private TextInputLayout mPassword,mPhoneNumber;
     private Button mCreateBtn;
+
     private FirebaseAuth mAuth;
     private ProgressDialog mRegProcess;
     private DatabaseReference mDatabase;
@@ -46,6 +47,7 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail= (TextInputLayout)findViewById(R.id.login_login_email);
         mPassword=(TextInputLayout) findViewById(R.id.login_login_password);
         mCreateBtn=(Button) findViewById(R.id.reg_reg_btn);
+        mPhoneNumber=findViewById(R.id.reg_phoneNumber);
 
         mCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,14 +55,16 @@ public class RegisterActivity extends AppCompatActivity {
                 String display_name=mDisplayName.getEditText().getText().toString();
                 String email=mEmail.getEditText().getText().toString();
                 String password=mPassword.getEditText().getText().toString();
+                String phoneNumber=mPhoneNumber.getEditText().getText().toString();
 
                 if (!TextUtils.isEmpty(display_name)||!TextUtils.isEmpty(email)||!TextUtils
-                        .isEmpty(password)) {
+                        .isEmpty(password))//|!TextUtils.isEmpty(phoneNumber))
+                        {
                     mRegProcess.setTitle("Registering User");
                     mRegProcess.setMessage("Please wait while we create your account!");
                     mRegProcess.setCanceledOnTouchOutside(false);
                     mRegProcess.show();
-                    register_user(display_name,email,password);
+                    register_user(display_name,email,password,phoneNumber);
                 }
 
 
@@ -69,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-    public void register_user(final String display_name, String email, String password){
+    public void register_user(final String display_name, String email, String password, final String phoneNumber){
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -83,6 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
                     userMap.put("status", "Hi, I am using OiYU!");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
+                    //userMap.put("phone_number",phoneNumber);
 
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

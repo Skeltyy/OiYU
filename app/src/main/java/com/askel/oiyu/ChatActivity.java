@@ -85,6 +85,7 @@ public class ChatActivity extends AppCompatActivity {
         messageSenderID=mAuth.getCurrentUser().getUid();
 
 
+
         messageReceiverID=getIntent().getExtras().get("user_id").toString();
         messageReceiverName=getIntent().getExtras().get("user_name").toString();
         messageImageStorageRef=FirebaseStorage.getInstance().getReference().child("Messages_Pictures");
@@ -136,7 +137,8 @@ public class ChatActivity extends AppCompatActivity {
                 Picasso.with(ChatActivity.this).load(userThumb).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_avatar).into(userChatProfileImage);
                 CircleImageView userImage=(CircleImageView) findViewById(R.id.user_single_image);
                if (online.equals("true")){
-                   userLastSeen.setText("Currently Online");
+                   userLastSeen.setText("Online");
+
                }else{
                    LastSeenTime getTime=new LastSeenTime();
 
@@ -256,6 +258,8 @@ public class ChatActivity extends AppCompatActivity {
 
                 messageList.add(messages);
 
+
+
                 messageAdapter.notifyDataSetChanged();
             }
 
@@ -320,5 +324,7 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    public void isSeen(){
 
+    }
 }
