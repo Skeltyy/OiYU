@@ -25,6 +25,7 @@ import android.widget.Toolbar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -75,7 +76,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private ProgressDialog loadingBar;
 
-    private FirebaseUser currentUser;
+    FirebaseUser currentUser;
     private DatabaseReference userReference;
 
 
@@ -196,7 +197,7 @@ public class ChatActivity extends AppCompatActivity {
         currentUser=mAuth.getCurrentUser();
 
         if (currentUser==null){
-            sentToStart();
+            //sentToStart();
         }else if (currentUser!=null){
             userReference.child("online").setValue("true");//If user is online, this will be true
 
