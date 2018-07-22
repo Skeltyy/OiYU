@@ -128,6 +128,8 @@ public class ChatActivity extends AppCompatActivity {
 
         userNameTitle.setText(messageReceiverName);
 
+        rootRef.child("online").setValue("true");//If user is online, this will be true
+
         rootRef.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
