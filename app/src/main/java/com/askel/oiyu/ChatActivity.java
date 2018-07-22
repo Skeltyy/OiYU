@@ -152,7 +152,10 @@ public class ChatActivity extends AppCompatActivity {
                if (online.equals("true")){
                    userLastSeen.setText("Online");
 
-               }else{
+               }else if (online.equals("inchat")){
+                    userLastSeen.setText("Currently in Chat");
+
+                }else{
                    LastSeenTime getTime=new LastSeenTime();
 
                    long last_seen=Long.parseLong(online);
@@ -197,7 +200,7 @@ public class ChatActivity extends AppCompatActivity {
         if (currentUser==null){
             sentToStart();
         }else if (currentUser!=null){
-            userReference.child("online").setValue("true");//If user is online, this will be true
+            userReference.child("online").setValue("inchat");//If user is online, this will be true
 
         }
     }
