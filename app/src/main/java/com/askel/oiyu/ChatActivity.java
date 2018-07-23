@@ -301,10 +301,36 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages=dataSnapshot.getValue(Messages.class);
+                if(!messages.isSeen())
+                {
+                    messages.setSeen(true);
+
+                    String message_sender_ref="Messages/"+messageSenderID+"/"+messageReceiverID;
+
+                    String message_receiver_ref="Messages/"+messageReceiverID+"/"+messageSenderID;
+
+                    DatabaseReference user_message_key =rootRef.child("Messages").child(messageSenderID)
+                            .child(messageReceiverID).push();
+
+                    String message_push_id=dataSnapshot.getKey();
+
+                    Map messageBodyDetails=new HashMap();
+                    messageBodyDetails.put(message_sender_ref+"/"+message_push_id,messages);
+                    messageBodyDetails.put(message_receiver_ref+"/"+message_push_id,messages);
+
+                    rootRef.updateChildren(messageBodyDetails, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError!=null){
+                                Log.d("Chat_Log",databaseError.getMessage().toString());
+                            }
+
+                            InputMessageText.setText("");
+                        }
+                    });
+                }
 
                 messageList.add(messages);
-
-
 
                 messageAdapter.notifyDataSetChanged();
             }
