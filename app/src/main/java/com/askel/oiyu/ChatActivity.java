@@ -144,21 +144,23 @@ public class ChatActivity extends AppCompatActivity {
         rootRef.child("Users").child(messageReceiverID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                final String online=dataSnapshot.child("online").getValue().toString();
+                final Object online=dataSnapshot.child("online").getValue();
                 final String userThumb=dataSnapshot.child("image").getValue().toString();
 
                 Picasso.with(ChatActivity.this).load(userThumb).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_avatar).into(userChatProfileImage);
                 CircleImageView userImage=(CircleImageView) findViewById(R.id.user_single_image);
-               if (online.equals("true")){
-                   userLastSeen.setText("Online");
-
-               }else if (online.equals(messageSenderID)){
-                    userLastSeen.setText("Currently in Chat");
-
-                }else{
+                if (online instanceof String){
+                    if (online.toString().equals(messageSenderID)){
+                        userLastSeen.setText("Currently in Chat");
+                    }
+                    else{
+                        userLastSeen.setText("Online");
+                    }
+                }
+                else{
                    LastSeenTime getTime=new LastSeenTime();
 
-                   long last_seen=Long.parseLong(online);
+                   long last_seen=Long.parseLong(online.toString());
 
                    String lastSeenDisplayTime=getTime.getTimeAgo(last_seen,getApplicationContext()).toString();
 
