@@ -29,6 +29,9 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.sql.Time;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -115,8 +118,7 @@ public class ChatsFragment extends Fragment {
                         String userStatus=dataSnapshot.child("status").getValue().toString();
 
                         if (dataSnapshot.hasChild("online")){
-                            String online_Status=(String) dataSnapshot.child("online").getValue()
-                                    .toString();
+                            Object online_Status= dataSnapshot.child("online").getValue();
                             holder.setUserOnline(online_Status);
                         }
                         holder.setName(userName);
@@ -190,10 +192,10 @@ public class ChatsFragment extends Fragment {
             Picasso.with(ctx).load(image).placeholder(R.drawable.default_avatar).into(userImage);
         }
 
-        public void setUserOnline(String online_Status) {
+        public void setUserOnline(Object online_Status) {
             ImageView onlineStatusView=(ImageView) mView.findViewById(R.id.online_status);
 
-            if (online_Status.equals("true") || online_Status.equals("inchat")){
+            if (online_Status instanceof String){
                 onlineStatusView.setVisibility(View.VISIBLE);
             }else {
                 onlineStatusView.setVisibility(View.INVISIBLE);
