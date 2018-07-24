@@ -26,7 +26,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout mDisplayName;
     private TextInputLayout mEmail;
     private TextInputLayout mPassword,mPhoneNumber;
-    private Button mCreateBtn;
+    private Button mCreateBtn,mVerifyBtn,mSendBtn;
 
     private FirebaseAuth mAuth;
     private ProgressDialog mRegProcess;
