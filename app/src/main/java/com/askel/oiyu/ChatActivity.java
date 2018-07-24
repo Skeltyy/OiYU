@@ -333,9 +333,13 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
                     }
-//                    else if( messages.timestamp.offset(5min) < time.now() )
+//                    else if( messages.timestamp.offset(5min) < time.now() && !messages.isSmsSent)
 //                    {
 //                        // send sms notification
+
+                          // update firebase to say we now sent the sms
+                             // messages.SetSmsSent(true)
+                             // push messages to firebase like we do above
 //                    }
                 }
 
