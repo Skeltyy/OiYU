@@ -79,6 +79,7 @@ public class ChatActivity extends AppCompatActivity {
     FirebaseUser currentUser;
     private DatabaseReference userReference;
 
+    private boolean isInChat = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,6 +198,8 @@ public class ChatActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
 
+        isInChat = true;
+
         currentUser=mAuth.getCurrentUser();
 
         if (currentUser==null){
@@ -210,6 +213,8 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        isInChat = false;
+
         if (currentUser!=null){
             userReference.child("online").setValue(ServerValue.TIMESTAMP);//If user minimizes the app, the status is offline
         }
@@ -301,16 +306,13 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages=dataSnapshot.getValue(Messages.class);
-                if(!messages.isSeen())
+                if(!messages.isSeen() && isInChat && messages.getFrom().equals(messageReceiverID))
                 {
                     messages.setSeen(true);
 
                     String message_sender_ref="Messages/"+messageSenderID+"/"+messageReceiverID;
 
                     String message_receiver_ref="Messages/"+messageReceiverID+"/"+messageSenderID;
-
-                    DatabaseReference user_message_key =rootRef.child("Messages").child(messageSenderID)
-                            .child(messageReceiverID).push();
 
                     String message_push_id=dataSnapshot.getKey();
 
