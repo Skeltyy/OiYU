@@ -4,18 +4,19 @@ public class Messages {
 
     private String message, type,from;
     private long time;
-    private boolean seen;
+    private boolean seen,SMSSent;
 
     public Messages(){
 
     }
 
-    public Messages(String message, String type, long time, boolean seen, String from) {
+    public Messages(String message, String type, long time, boolean seen, String from,boolean SMSSent) {
         this.message = message;
         this.type = type;
         this.time = time;
         this.seen = seen;
         this.from=from;
+        this.SMSSent=SMSSent;
     }
     public String getFrom(){
         return from;
@@ -54,6 +55,14 @@ public class Messages {
 
     public boolean isSeen() {
         return seen;
+    }
+
+    public boolean isSMSSent() {
+        return SMSSent;
+    }
+
+    public void setSMSSent(boolean SMSSent) {
+        this.SMSSent = SMSSent;
     }
 
     public void setSeen(boolean seen) {

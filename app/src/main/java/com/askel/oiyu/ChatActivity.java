@@ -39,6 +39,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private String messageReceiverID;
     private String messageReceiverName;
+    private static final int SECOND_MILLIS = 1000;
+
+    private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 
     private TextView userNameTitle;
     private TextView userLastSeen;
@@ -138,6 +142,7 @@ public class ChatActivity extends AppCompatActivity {
 
         userMessagesList.setAdapter(messageAdapter);
 
+
         FetchMessages();
 
         userNameTitle.setText(messageReceiverName);
@@ -147,6 +152,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 final Object online=dataSnapshot.child("online").getValue();
                 final String userThumb=dataSnapshot.child("image").getValue().toString();
+
 
                 Picasso.with(ChatActivity.this).load(userThumb).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_avatar).into(userChatProfileImage);
                 CircleImageView userImage=(CircleImageView) findViewById(R.id.user_single_image);
@@ -301,6 +307,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void FetchMessages() {
+
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
             @Override
@@ -332,6 +339,9 @@ public class ChatActivity extends AppCompatActivity {
                                 InputMessageText.setText("");
                             }
                         });
+                    }else if (messages.getTime()+MINUTE_MILLIS<System.currentTimeMillis()&&!messages.isSMSSent()){
+                        SMSSent();
+                        messages.setSMSSent(true);
                     }
 //                    else if( messages.timestamp.offset(5min) < time.now() && !messages.isSmsSent)
 //                    {
@@ -369,7 +379,11 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-////////////////////////////////////////////Sending Messages-Operational/////////////////////////////////////////////////////////
+
+    private void SMSSent() {
+    }
+
+    ////////////////////////////////////////////Sending Messages-Operational/////////////////////////////////////////////////////////
     private void SendMessage() {
         String messageText=InputMessageText.getText().toString();
         if (TextUtils.isEmpty(messageText)){
@@ -391,6 +405,7 @@ public class ChatActivity extends AppCompatActivity {
             messageTextBody.put("type","text");
             messageTextBody.put("time", ServerValue.TIMESTAMP);
             messageTextBody.put("from",messageSenderID);
+            messageTextBody.put("smsSent",false);
 
             Map messageBodyDetails=new HashMap();
             messageBodyDetails.put(message_sender_ref+"/"+message_push_id,messageTextBody);
