@@ -1,10 +1,15 @@
 package com.askel.oiyu;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,10 +50,12 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
+    final static int SEND_SMS_PERMISSIONS_REQUEST_CODE=1;
 
     private String messageReceiverID;
     private String messageReceiverName;
     private static final int SECOND_MILLIS = 1000;
+    int MY_PERMISSIONS_REQUEST_SEND_SMS=1;
 
     private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 
@@ -89,6 +96,9 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+
+
 
         rootRef= FirebaseDatabase.getInstance().getReference();
         mAuth=FirebaseAuth.getInstance();
@@ -315,8 +325,7 @@ public class ChatActivity extends AppCompatActivity {
                 Messages messages=dataSnapshot.getValue(Messages.class);
                 if(!messages.isSeen() && messages.getFrom().equals(messageReceiverID))
                 {
-                    if(isInChat)
-                    {
+                    if(isInChat) {
                         messages.setSeen(true);
 
                         String message_sender_ref = "Messages/" + messageSenderID + "/" + messageReceiverID;
@@ -339,18 +348,19 @@ public class ChatActivity extends AppCompatActivity {
                                 InputMessageText.setText("");
                             }
                         });
-                    }else if (messages.getTime()+MINUTE_MILLIS<System.currentTimeMillis()&&!messages.isSMSSent()){
-                        SendSMS(receiverPhoneNumber,smsMessageText);
-                        messages.setSMSSent(true);
-                    }
+//                    }else if (messages.getTime()+MINUTE_MILLIS<System.currentTimeMillis()&&!messages.isSMSSent()){
+//                        SendSMS(receiverPhoneNumber,smsMessageText);
+//                        messages.setSMSSent(true);
+//                    }
 //                    else if( messages.timestamp.offset(5min) < time.now() && !messages.isSmsSent)
 //                    {
 //                        // send sms notification
 
-                          // update firebase to say we now sent the sms
-                             // messages.SetSmsSent(true)
-                             // push messages to firebase like we do above
+                        // update firebase to say we now sent the sms
+                        // messages.SetSmsSent(true)
+                        // push messages to firebase like we do above
 //                    }
+                    }
                 }
 
                 messageList.add(messages);
@@ -379,17 +389,25 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+    private void checkPermission(String permission) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS_REQUEST_SEND_SMS);
+        }
+    }
 
     private void SendSMS(String phoneNo, String msg) {
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-            Toast.makeText(getApplicationContext(), "Message Sent",
-                    Toast.LENGTH_LONG).show();
-        } catch (Exception ex) {
-            Toast.makeText(getApplicationContext(),ex.getMessage().toString(),
-                    Toast.LENGTH_LONG).show();
-            ex.printStackTrace();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS_REQUEST_SEND_SMS);
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+                Toast.makeText(getApplicationContext(), "Message Sent",
+                        Toast.LENGTH_LONG).show();
+            } catch (Exception ex) {
+                Toast.makeText(getApplicationContext(), ex.getMessage().toString(),
+                        Toast.LENGTH_LONG).show();
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -421,6 +439,8 @@ public class ChatActivity extends AppCompatActivity {
             Map messageBodyDetails=new HashMap();
             messageBodyDetails.put(message_sender_ref+"/"+message_push_id,messageTextBody);
             messageBodyDetails.put(message_receiver_ref+"/"+message_push_id,messageTextBody);
+            SendSMS("07762779777","YOYOYO");
+
 
             rootRef.updateChildren(messageBodyDetails, new DatabaseReference.CompletionListener() {
                 @Override
