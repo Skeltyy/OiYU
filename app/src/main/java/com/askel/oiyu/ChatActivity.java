@@ -1,10 +1,14 @@
 package com.askel.oiyu;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,6 +49,8 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
+
+    int MY_PERMISSIONS_REQUEST_SEND_SMS=1;
 
     private String messageReceiverID;
     private String messageReceiverName;
@@ -313,31 +319,21 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages=dataSnapshot.getValue(Messages.class);
-                if(!messages.isSeen() && messages.getFrom().equals(messageReceiverID))
-                {
-                    if(isInChat)
-                    {
-                        messages.setSeen(true);
-                        updateMessageInFirebase(dataSnapshot,messages);
-                    }
-                    else if (messages.getTime()+MINUTE_MILLIS < System.currentTimeMillis() && !messages.isSMSSent())
-                    {
-                        SendSMS(receiverPhoneNumber, smsMessageText);
-                        messages.setSMSSent(true);
-                        updateMessageInFirebase(dataSnapshot,messages);
-                    }
-//                    else if( messages.timestamp.offset(5min) < time.now() && !messages.isSmsSent)
-//                    {
-//                        // send sms notification
 
-                          // update firebase to say we now sent the sms
-                             // messages.SetSmsSent(true)
-                             // push messages to firebase like we do above
-//                    }
+                if(isInChat && !messages.isSeen() && messages.getFrom().equals(messageReceiverID))
+                {
+                    messages.setSeen(true);
+                    updateMessageInFirebase(dataSnapshot,messages);
+                }
+
+                if (!messages.isSMSSent())
+                {
+                    SendSMS(receiverPhoneNumber, smsMessageText);
+                    messages.setSMSSent(true);
+                    updateMessageInFirebase(dataSnapshot,messages);
                 }
 
                 messageList.add(messages);
-
                 messageAdapter.notifyDataSetChanged();
             }
 
@@ -384,13 +380,22 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
-    private void SendSMS(String phoneNo, String msg) {
-        try {
+    private void SendSMS(String phoneNo, String msg)
+    {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
+        }
+
+        try
+        {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, msg, null, null);
             Toast.makeText(getApplicationContext(), "Message Sent",
                     Toast.LENGTH_LONG).show();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             Toast.makeText(getApplicationContext(),ex.getMessage().toString(),
                     Toast.LENGTH_LONG).show();
             ex.printStackTrace();
