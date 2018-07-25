@@ -320,19 +320,21 @@ public class ChatActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages messages=dataSnapshot.getValue(Messages.class);
 
-                if(isInChat && !messages.isSeen() && messages.getFrom().equals(messageReceiverID))
+                if(!messages.isSeen())
                 {
-                    messages.setSeen(true);
-                    updateMessageInFirebase(dataSnapshot,messages);
-                }
+                    if (isInChat && messages.getFrom().equals(messageReceiverID))
+                    {
+                        messages.setSeen(true);
+                        updateMessageInFirebase(dataSnapshot, messages);
+                    }
 
-                if (!messages.isSMSSent())
-                {
-                    SendSMS(receiverPhoneNumber, smsMessageText);
-                    messages.setSMSSent(true);
-                    updateMessageInFirebase(dataSnapshot,messages);
+                    if (!messages.isSMSSent() && messages.getTime()+MINUTE_MILLIS < System.currentTimeMillis())
+                    {
+                        SendSMS(receiverPhoneNumber, smsMessageText);
+                        messages.setSMSSent(true);
+                        updateMessageInFirebase(dataSnapshot, messages);
+                    }
                 }
-
                 messageList.add(messages);
                 messageAdapter.notifyDataSetChanged();
             }
