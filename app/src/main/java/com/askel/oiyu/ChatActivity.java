@@ -3,7 +3,6 @@ package com.askel.oiyu;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -11,16 +10,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,7 +37,6 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +81,9 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference userReference;
 
     private boolean isInChat = true;
+    String smsMessageText="You have an unread Message on OiYU.";
+    String receiverPhoneNumber="07762779777";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -340,7 +340,7 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
                     }else if (messages.getTime()+MINUTE_MILLIS<System.currentTimeMillis()&&!messages.isSMSSent()){
-                        SMSSent();
+                        SendSMS(receiverPhoneNumber,smsMessageText);
                         messages.setSMSSent(true);
                     }
 //                    else if( messages.timestamp.offset(5min) < time.now() && !messages.isSmsSent)
@@ -380,8 +380,19 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    private void SMSSent() {
+    private void SendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+            Toast.makeText(getApplicationContext(), "Message Sent",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(),ex.getMessage().toString(),
+                    Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
     }
+
 
     ////////////////////////////////////////////Sending Messages-Operational/////////////////////////////////////////////////////////
     private void SendMessage() {
