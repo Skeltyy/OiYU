@@ -1,32 +1,44 @@
 package com.askel.oiyu;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class RegisterActivity extends AppCompatActivity {
+    int MY_PERMISSIONS_REQUEST_SEND_SMS=1;
 
     private TextInputLayout mDisplayName;
     private TextInputLayout mEmail;
-    private TextInputLayout mPassword,mPhoneNumber;
-    private Button mCreateBtn,mVerifyBtn,mSendBtn;
+    private TextInputLayout mPassword,mPhoneNumber,mVerificationCode;
+    private EditText mPhoneNumberInput;
+    private Button mRegisterBtn,mVerifyBtn,mSendBtn;
+    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
 
     private FirebaseAuth mAuth;
     private ProgressDialog mRegProcess;
@@ -43,13 +55,60 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth=FirebaseAuth.getInstance();
 
-        mDisplayName=(TextInputLayout) findViewById(R.id.status_name);
-        mEmail= (TextInputLayout)findViewById(R.id.login_login_email);
-        mPassword=(TextInputLayout) findViewById(R.id.login_login_password);
-        mCreateBtn=(Button) findViewById(R.id.reg_reg_btn);
-        mPhoneNumber=findViewById(R.id.reg_phoneNumber);
+        mDisplayName=findViewById(R.id.status_name);
+        mEmail= findViewById(R.id.login_login_email);
+        mPassword=findViewById(R.id.reg_password);
+        mVerifyBtn=findViewById(R.id.reg_verify_numBtn);
+        mSendBtn=findViewById(R.id.reg_send_text_btn);
+        mRegisterBtn =(Button) findViewById(R.id.reg_reg_btn);
+        mPhoneNumberInput=findViewById(R.id.reg_phoneNumberInput);
+        mVerificationCode=findViewById(R.id.reg_verification_code);
 
-        mCreateBtn.setOnClickListener(new View.OnClickListener() {
+        mVerificationCode.setVisibility(View.INVISIBLE);
+        mVerificationCode.setEnabled(false);
+        mVerifyBtn.setVisibility(View.INVISIBLE);
+        mVerifyBtn.setEnabled(false);
+
+
+        mSendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mSendBtn.setEnabled(false);
+
+                mVerifyBtn.setEnabled(true);
+                mVerifyBtn.setVisibility(View.VISIBLE);
+                mVerificationCode.setEnabled(true);
+                mVerificationCode.setVisibility(View.VISIBLE);
+                if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+                {
+                    ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
+                }
+
+
+
+                    String phoneNumber = mPhoneNumberInput.getText().toString();
+                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, RegisterActivity.this, mCallbacks);
+                }
+
+
+
+
+
+
+        });
+        mCallbacks=new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+            @Override
+            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+
+            }
+
+            @Override
+            public void onVerificationFailed(FirebaseException e) {
+
+            }
+        };
+        mRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String display_name=mDisplayName.getEditText().getText().toString();

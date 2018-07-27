@@ -1,10 +1,13 @@
 package com.askel.oiyu;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.icu.util.TimeUnit;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -48,6 +51,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static java.lang.System.currentTimeMillis;
+
 public class ChatActivity extends AppCompatActivity {
 
     int MY_PERMISSIONS_REQUEST_SEND_SMS=1;
@@ -56,7 +61,7 @@ public class ChatActivity extends AppCompatActivity {
     private String messageReceiverName;
     private static final int SECOND_MILLIS = 1000;
 
-    private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
+    private static final int MINUTE_MILLIS = 10 * SECOND_MILLIS;
 
     private TextView userNameTitle;
     private TextView userLastSeen;
@@ -314,11 +319,14 @@ public class ChatActivity extends AppCompatActivity {
 
     private void FetchMessages() {
 
+
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Messages messages=dataSnapshot.getValue(Messages.class);
+                final DataSnapshot dataSnapshot1=dataSnapshot;
+                final Messages messages=dataSnapshot.getValue(Messages.class);
+                String msgTime=dataSnapshot.child("time").getValue().toString();
 
                 if(!messages.isSeen())
                 {
@@ -328,16 +336,31 @@ public class ChatActivity extends AppCompatActivity {
                         updateMessageInFirebase(dataSnapshot, messages);
                     }
 
-                    if (!messages.isSMSSent() && messages.getTime()+MINUTE_MILLIS < System.currentTimeMillis())
+                    if (messages.getTime()+MINUTE_MILLIS<currentTimeMillis()&&!messages.isSMSSent())
                     {
-                        SendSMS(receiverPhoneNumber, smsMessageText);
-                        messages.setSMSSent(true);
-                        updateMessageInFirebase(dataSnapshot, messages);
+//                        CharSequence smsOptions[]=new CharSequence[]{
+//                                "Looks like your message has not been noticed. Would you like to send a reminder?"
+//                        };
+//                        AlertDialog.Builder builder=new AlertDialog.Builder(getApplicationContext());
+//                        builder.setTitle("Message Not Seen");
+//                        builder.setItems(smsOptions, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                if (which==0){
+                                    SendSMS(receiverPhoneNumber, smsMessageText);
+                                    messages.setSMSSent(true);
+                                    updateMessageInFirebase(dataSnapshot1, messages);
+//                                }
+//                            }
+//                        });
+//                        builder.show();
+
                     }
                 }
                 messageList.add(messages);
                 messageAdapter.notifyDataSetChanged();
             }
+
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {

@@ -35,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginProgress=new ProgressDialog(this);
         mLoginEmail=(TextInputLayout) findViewById(R.id.login_login_email);
-        mLoginPassword=(TextInputLayout) findViewById(R.id.login_login_password);
+        mLoginPassword=(TextInputLayout) findViewById(R.id.reg_phoneNumber);
         mLogin_Btn=(Button) findViewById(R.id.lgn_login_btn);
 
         mLogin_Btn.setOnClickListener(new View.OnClickListener() {
