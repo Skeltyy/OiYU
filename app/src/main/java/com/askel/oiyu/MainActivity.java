@@ -3,6 +3,7 @@ package com.askel.oiyu;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -97,6 +98,9 @@ public class MainActivity extends AppCompatActivity {
             Intent accountIntent=new Intent(MainActivity.this,SettingsActivity.class );
             startActivity(accountIntent);
         }
+        if (id==R.id.create_group){
+            RequestNewGroup();
+        }
         if(id== R.id.logout) {
             if (currentUser!=null){
                 userReference.child("online").setValue(ServerValue.TIMESTAMP);
@@ -111,6 +115,12 @@ public class MainActivity extends AppCompatActivity {
             startActivity(settingsIntent);
         }
             return true;
+
+    }
+
+    private void RequestNewGroup() {
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
 
     }
 }

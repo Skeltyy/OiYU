@@ -64,57 +64,57 @@ public class RegisterActivity extends AppCompatActivity {
         mPhoneNumberInput=findViewById(R.id.reg_phoneNumberInput);
         mVerificationCode=findViewById(R.id.reg_verification_code);
 
-        mVerificationCode.setVisibility(View.INVISIBLE);
-        mVerificationCode.setEnabled(false);
-        mVerifyBtn.setVisibility(View.INVISIBLE);
-        mVerifyBtn.setEnabled(false);
+//        mVerificationCode.setVisibility(View.INVISIBLE);
+//        mVerificationCode.setEnabled(false);
+//        mVerifyBtn.setVisibility(View.INVISIBLE);
+//        mVerifyBtn.setEnabled(false);
 
 
-        mSendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                mSendBtn.setEnabled(false);
-
-                mVerifyBtn.setEnabled(true);
-                mVerifyBtn.setVisibility(View.VISIBLE);
-                mVerificationCode.setEnabled(true);
-                mVerificationCode.setVisibility(View.VISIBLE);
-                if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
-                {
-                    ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
-                }
-
-
-
-                    String phoneNumber = mPhoneNumberInput.getText().toString();
-                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, RegisterActivity.this, mCallbacks);
-                }
-
-
-
-
-
-
-        });
-        mCallbacks=new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-            @Override
-            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-
-            }
-
-            @Override
-            public void onVerificationFailed(FirebaseException e) {
-
-            }
-        };
+//        mSendBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                mSendBtn.setEnabled(false);
+//
+//                mVerifyBtn.setEnabled(true);
+//                mVerifyBtn.setVisibility(View.VISIBLE);
+//                mVerificationCode.setEnabled(true);
+//                mVerificationCode.setVisibility(View.VISIBLE);
+//                if (ContextCompat.checkSelfPermission(RegisterActivity.this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED)
+//                {
+//                    ActivityCompat.requestPermissions(RegisterActivity.this, new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS_REQUEST_SEND_SMS);
+//                }
+//
+//
+//
+//                    String phoneNumber = mPhoneNumberInput.getText().toString();
+//                    PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, RegisterActivity.this, mCallbacks);
+//                }
+//
+//
+//
+//
+//
+//
+//        });
+//        mCallbacks=new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+//            @Override
+//            public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
+//
+//            }
+//
+//            @Override
+//            public void onVerificationFailed(FirebaseException e) {
+//
+//            }
+//        };
         mRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String display_name=mDisplayName.getEditText().getText().toString();
                 String email=mEmail.getEditText().getText().toString();
                 String password=mPassword.getEditText().getText().toString();
-                String phoneNumber=mPhoneNumber.getEditText().getText().toString();
+                String phoneNumber=mPhoneNumberInput.getText().toString();
 
                 if (!TextUtils.isEmpty(display_name)||!TextUtils.isEmpty(email)||!TextUtils
                         .isEmpty(password))//|!TextUtils.isEmpty(phoneNumber))
@@ -146,7 +146,7 @@ public class RegisterActivity extends AppCompatActivity {
                     userMap.put("status", "Hi, I am using OiYU!");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
-                    //userMap.put("phone_number",phoneNumber);
+                    userMap.put("phone_number",phoneNumber);
 
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

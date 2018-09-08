@@ -2,6 +2,9 @@ package com.askel.oiyu;
 
 import android.app.Application;
 import android.content.Context;
+
+import java.util.Date;
+
 //Sets up the Last seen time feature called in other classes
 public class LastSeenTime extends Application {
     /*
@@ -60,6 +63,27 @@ public class LastSeenTime extends Application {
         else {
             return diff / DAY_MILLIS + " days ago";
         }
+    }
+
+    public static boolean doSendMessage(long time, long triggerTime ) {
+        if (time < 1000000000000L) {
+            // if timestamp given in seconds, convert to millis
+            time *= 1000;
+        }
+
+        long now = System.currentTimeMillis();
+        if (time > now || time <= 0) {
+            return false;
+        }
+
+
+        final long diff = now - time;
+        if (diff > triggerTime)
+        {
+            return true;
+        }
+
+        return false;
     }
 
 }

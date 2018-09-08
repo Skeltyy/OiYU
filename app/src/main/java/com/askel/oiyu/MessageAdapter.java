@@ -1,5 +1,6 @@
 package com.askel.oiyu;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,7 +50,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             usersReference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                 }
 
                 @Override
@@ -58,11 +59,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             });
 
         }
-
-
-
-
-
         return new MessageViewHolder(v);
     }
 
@@ -70,14 +66,29 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     ///////////////////////////////////Message View-Displaying Messages///////////////////////////////////////////////////////////
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    public void onBindViewHolder(MessageViewHolder holder, int position){
+    public void onBindViewHolder(final MessageViewHolder holder, int position){
         String message_sender_id=mAuth.getCurrentUser().getUid();
         Messages messages=userMessagesList.get(position);
 
         String fromUserId=messages.getFrom();
 
+        usersReference=FirebaseDatabase.getInstance().getReference().child("Users").child("Image");
+        usersReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+               // final String image = dataSnapshot.child("image")
+                    //    .getValue().toString();
+               // holder.setImage(image, getContext());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         if(Objects.equals(fromUserId, message_sender_id))
         {
+
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
             holder.messageText.setGravity(Gravity.START);
@@ -96,6 +107,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     public class MessageViewHolder extends RecyclerView.ViewHolder{
+        View mView;
         public TextView messageText;
         public CircleImageView userProfileImage;
 
@@ -103,8 +115,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             super(view);
 
             messageText=(TextView) view.findViewById(R.id.message_text);
+            mView=itemView;
 
-            //userProfileImage=(CircleImageView) view.findViewById(R.id.messages_profile_image);
+            userProfileImage=(CircleImageView) view.findViewById(R.id.messages_profile_image);
         }
+
+        public void setImage(String image, final Context ctx) {
+            CircleImageView userImage = (CircleImageView) mView.findViewById(R.id.request_profile_image);
+            Picasso.with(ctx).load(image).placeholder(R.drawable.default_avatar).into(userImage);
+        }
+
+
     }
 }

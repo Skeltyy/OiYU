@@ -89,6 +89,7 @@ public class FriendsFragment extends Fragment {
         Query query = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("Friends");
+                //.child(online_User_Id);
 
 
         FirebaseRecyclerOptions<Friends> options =

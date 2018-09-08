@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.icu.util.TimeUnit;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -51,6 +52,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.askel.oiyu.LastSeenTime.doSendMessage;
 import static java.lang.System.currentTimeMillis;
 
 public class ChatActivity extends AppCompatActivity {
@@ -61,7 +63,7 @@ public class ChatActivity extends AppCompatActivity {
     private String messageReceiverName;
     private static final int SECOND_MILLIS = 1000;
 
-    private static final int MINUTE_MILLIS = 10 * SECOND_MILLIS;
+    private static final int MINUTE_MILLIS = 20 * SECOND_MILLIS;
 
     private TextView userNameTitle;
     private TextView userLastSeen;
@@ -93,7 +95,10 @@ public class ChatActivity extends AppCompatActivity {
 
     private boolean isInChat = true;
     String smsMessageText="You have an unread Message on OiYU.";
-    String receiverPhoneNumber="07762779777";
+    String receiverPhoneNumber;
+
+    final Handler handler = new Handler();
+    Runnable refresh;
 
 
     @Override
@@ -112,6 +117,7 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         messageSenderID=mAuth.getCurrentUser().getUid();
+        receiverPhoneNumber=
 
 
 
@@ -153,8 +159,17 @@ public class ChatActivity extends AppCompatActivity {
 
         userMessagesList.setAdapter(messageAdapter);
 
+        RenderMessages();
 
-        FetchMessages();
+        refresh = new Runnable() {
+            public void run() {
+                FetchMessages();
+                // Do something
+                handler.postDelayed(refresh, 5000);
+            }
+        };
+        handler.post(refresh);
+
 
         userNameTitle.setText(messageReceiverName);
 
@@ -318,70 +333,115 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void FetchMessages() {
-
-
         rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
                 .addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                final DataSnapshot dataSnapshot1=dataSnapshot;
-                final Messages messages=dataSnapshot.getValue(Messages.class);
-                String msgTime=dataSnapshot.child("time").getValue().toString();
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        final DataSnapshot dataSnapshot1=dataSnapshot;
+                        final Messages messages=dataSnapshot.getValue(Messages.class);
+                        Long msgTime=(Long)dataSnapshot.child("time").getValue();
 
-                if(!messages.isSeen())
-                {
-                    if (isInChat && messages.getFrom().equals(messageReceiverID))
-                    {
-                        messages.setSeen(true);
-                        updateMessageInFirebase(dataSnapshot, messages);
-                    }
+                        if(!messages.isSeen())
+                        {
+                            if (isInChat && messages.getFrom().equals(messageReceiverID))
+                            {
+                                messages.setSeen(true);
+                                updateMessageInFirebase(dataSnapshot, messages);
+                            }
 
-                    if (messages.getTime()+MINUTE_MILLIS<currentTimeMillis()&&!messages.isSMSSent())
-                    {
-//                        CharSequence smsOptions[]=new CharSequence[]{
+                            if (!messages.isSMSSent()&&doSendMessage(msgTime,MINUTE_MILLIS))
+                            {
+
+//                        final CharSequence smsOptions[]=new CharSequence[]{
 //                                "Looks like your message has not been noticed. Would you like to send a reminder?"
 //                        };
+//
+//
 //                        AlertDialog.Builder builder=new AlertDialog.Builder(getApplicationContext());
 //                        builder.setTitle("Message Not Seen");
 //                        builder.setItems(smsOptions, new DialogInterface.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialog, int which) {
 //                                if (which==0){
-                                    SendSMS(receiverPhoneNumber, smsMessageText);
-                                    messages.setSMSSent(true);
-                                    updateMessageInFirebase(dataSnapshot1, messages);
+                                SendSMS(receiverPhoneNumber, smsMessageText);
+                                messages.setSMSSent(true);
+                                updateMessageInFirebase(dataSnapshot1, messages);
 //                                }
 //                            }
 //                        });
-//                        builder.show();
+/////
+
+
+                                
+                                ///
+
+//                                try {
+//                                    builder.wait(MINUTE_MILLIS);
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                builder.show();
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
                     }
-                }
-                messageList.add(messages);
-                messageAdapter.notifyDataSetChanged();
-            }
 
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
 
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    }
 
-            }
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    }
 
-            }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    }
+                });
 
-            }
+    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+    private void RenderMessages() {
 
-            }
-        });
+        rootRef.child("Messages").child(messageSenderID).child(messageReceiverID)
+               .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        final DataSnapshot dataSnapshot1=dataSnapshot;
+                        final Messages messages=dataSnapshot.getValue(Messages.class);
+
+                        messageList.add(messages);
+                        messageAdapter.notifyDataSetChanged();
+                    }
+
+                   @Override
+                   public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                   }
+
+                   @Override
+                   public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                   }
+
+                   @Override
+                   public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                   }
+
+                   @Override
+                   public void onCancelled(DatabaseError databaseError) {
+
+                   }
+               });
     }
 
     private void updateMessageInFirebase(DataSnapshot dataSnapshot, Messages messages)
@@ -469,7 +529,4 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    public void isSeen(){
-
-    }
 }
